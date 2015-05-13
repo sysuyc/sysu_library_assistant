@@ -19,6 +19,8 @@ class Books(models.Model):
 		return "Book name : " + bname + "\nauthor : " + author + "\npublisher : " + publisher
 
 class Relation(models.Model):
-	bid = models.IntegerField(default =-0)
-	cid = models.IntegerField(default = 0)
+	# one course has several correlated books
+	course = models.ForeignKey(Courses)
+	# not every book has relation with course, eg : search book directly by book name
+	bid = models.IntegerField(default = 0)
 	click = models.IntegerField(default = 0)
