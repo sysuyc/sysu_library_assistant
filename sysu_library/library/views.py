@@ -27,6 +27,7 @@ def getExistCourseRecord(course_object):
 	for bookid in bookids:
 		xml += getBookItemXml(bookid)
 	xml += '''</bookList>'''
+	return xml
 
 # create a xml for a book
 def getBookItemXml(bookid):
@@ -34,13 +35,6 @@ def getBookItemXml(bookid):
 		b = Books.objects.get(id = bookid)
 	except Books.DoesNotExist:
 		return ""
-	        <name>书名</name>
-        <pic>封面图url</pic>
-        <author>作者</author>
-        <publisher>出版社</publisher>
-        <num>索书号</num>
-        <av>是否可借(0或1</av>
-        <detail>详情页面url的id</detail>
 	item_xml = '<item>\n' +\
 	           '<name>%s</name>\n' +\
 	           '<pic>%s</pic>\n' +\
@@ -49,8 +43,11 @@ def getBookItemXml(bookid):
                '<num>%s</num>\n' +\
                '<detail>%s</detail>\n' +\
                '</item>\n'
+    item_xml = item_xml % (b.name, b.pic, b.author, b.publisher, b.num, b.detail)
+    return item_xml
 
 def getExistBookRecord():
+	pass
 
 def searchByBook(requset):
 	pass
