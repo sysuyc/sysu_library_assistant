@@ -89,7 +89,7 @@ class CourseReptile(object):
                 book_title = a.get('title')
                 if book_title:
                     self.ResultList.append(book_title)
-                    print book_title
+                    # print book_title
                     break
 
     def _get_books_hidden(self, node):
