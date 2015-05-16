@@ -108,4 +108,4 @@ if __name__ == '__main__':
         course_name = sys.argv[1]
     else:
         course_name = '系统分析与设计'
-    cr.course_search(course_name)
+    print cr.course_search(course_name)

@@ -2,9 +2,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from library.models import *
-# from library.courseCrawler import getBooksByCourse
+from course_reptile.reptile import CourseReptile
 # from library.bookCrawler import getBooksListByName
 
+'''
+search books by couse name
+return the result as xml
+service for android application
+'''
 def searchByCourse(requset):
 	if requset.method == 'GET':
 		course = requset.GET["course"]
@@ -14,9 +19,19 @@ def searchByCourse(requset):
 			# return the historic result
 			return getExistCourseRecord(c)
 		except Course.DoesNotExist:
-			booksNames = getBooksByCourse(course)
+			# this course has not been searched before
+			# search it, and store the result in database
+			cr = CourseReptile()
+			booksNames = cr.course_search(course)
+			# if not correlated book for this course
 			if not len(booksNames):
 				return HttpResponse("No correlated book")
+			c = Coures.objects.create(cname = course, description = "")
+			c.save()
+			for bookName in booksNames:
+				# to be implement. this operation should return a list of dictionary
+				books = getBooksListByName(bookName)
+				# some database operation
 
 # service for function searchByCourse
 def getExistCourseRecord(course_object):
