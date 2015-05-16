@@ -11,27 +11,40 @@ return the result as xml
 service for android application
 '''
 def searchByCourse(requset):
-    if requset.method == 'GET':
+    try:
         course = requset.GET["course"]
-        try:
-            # check whether this couse is in database
-            c = Course.objects.get(cname = course)
-            # return the historic result
-            return getExistCourseRecord(c)
-        except Course.DoesNotExist:
-            # this course has not been searched before
-            # search it, and store the result in database
-            cr = CourseReptile()
-            booksNames = cr.course_search(course)
-            # if not correlated book for this course
-            if not len(booksNames):
-                return HttpResponse("No correlated book")
-            c = Coures.objects.create(cname = course, description = "")
-            c.save()
-            for bookName in booksNames:
-                # to be implement. this operation should return a list of dictionary
-                books = getBooksListByName(bookName)
-                # some database operation
+    except:
+        return HttpResponse("Request error") 
+    try:
+        # check whether this couse is in database
+        c = Course.objects.get(cname = course)
+        # return the historic result
+        xml =  getExistCourseRecord(c)
+        return xml
+    except Course.DoesNotExist:
+        # this course has not been searched before
+        # search it, and store the result in database
+        cr = CourseReptile()
+        booksNames = cr.course_search(course)
+        # if not correlated book for this course
+        if not len(booksNames):
+            return HttpResponse("No correlated book")
+        c = Coures.objects.create(cname = course, description = "")
+        c.save()
+        xml = ""
+        for bookName in booksNames:
+            # to be implement. this operation should return a list of dictionary
+            books = getBooksListByName(bookName = bookName, num = 3)
+            # some database operation
+            for book in books:
+                # book is a dictionary
+                bookid = storeBookItem(book)
+                # construct the return xml
+                xml += getBookItemXml(bookid)
+                # create the relation for this new course and the the relative book
+                r = Relation.objects.create(course = c, bid = bookid, click = 0)
+                r.save()
+        return xml
 
 # service for function searchByCourse
 def getExistCourseRecord(course_object):
@@ -60,6 +73,19 @@ def getBookItemXml(bookid):
                '</item>\n'
     item_xml = item_xml % (b.name, b.pic, b.author, b.publisher, b.num, b.detail)
     return item_xml
+
+# store a book item into database
+# item is a dictionary, has keys : name, pic, author, publisher, isbn, detail
+def storeBookItem(item):
+    try:
+        b = Books.objects.get(bname = item.name, author = item.author, num = item.num)
+        return b.id
+    except:
+    b = Books.objects.create(bname = item.name, publisher = item.publisher,
+                            author = item.author, pic = item.pic,
+                            isbn = item.isbn, url = item.url)
+    b.save()
+    return b.id
 
 def getExistBookRecord():
     pass
