@@ -1,7 +1,5 @@
 from django.db import models
 
-# Create your models here.
-
 class Courses(models.Model):
     cname = models.CharField(max_length = 100)
     description = models.CharField(max_length = 2000)
