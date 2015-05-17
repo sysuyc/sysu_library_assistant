@@ -10,7 +10,7 @@ class Courses(models.Model):
 
 class Books(models.Model):
     bname = models.CharField(max_length = 100)
-    isbn = models.CharField(primary_key = True, max_length = 20)
+    isbn = models.CharField(max_length = 20)
     author = models.CharField(max_length = 100)
     publisher = models.CharField(max_length = 100)
     pic = models.CharField(max_length = 100)
