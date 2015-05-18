@@ -11,7 +11,7 @@
 
 """
 
-__author__=='patrick'
+__author__ ='patrick'
 
 
 import urllib
@@ -19,10 +19,11 @@ import urllib2
 import re
 import json
 import thread
-import Levenshtein
+from django.utils.http import urlquote
+#import Levenshtein
 
 
-class FilmSpider:
+class solaSpider(object):
     def __init__(self):
         pass
 
@@ -33,7 +34,10 @@ class FilmSpider:
         """
 
         self.start_url = "http://202.116.64.108:8991/F/-?func=find-b&find_code=WRD&request="
-        self.start_url += bookName + "&local_base=ZSU01"
+        # solve the encode question
+        # but sometime this function will throw exception
+        # for example, search "计算机网络技术"
+        self.start_url += urlquote(bookName) + "&local_base=ZSU01"
         self.container = []
 
         response = urllib2.urlopen(self.start_url)
@@ -106,7 +110,8 @@ class FilmSpider:
     def exactMatch(self, bookName):
         tmpContainer = []
         for item in self.container:
-            p = Levenshtein.ratio(item['bname'].upper(), bookName.upper())
+            #p = Levenshtein.ratio(item['bname'].upper(), bookName.upper())
+            p = 0.95
             if p >= 0.95:
                 tmpContainer.append(item)
         self.container = tmpContainer
@@ -141,7 +146,8 @@ if __name__ == '__main__':
     print('-----------------Start crawl----------------------')
     sola = solaSpider()
     books = sola.getBookList(bookName, True)
-    print books
+    for book in books:
+        print book
     print '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
     book = sola.getDetail(books[0]['link'])
     print book

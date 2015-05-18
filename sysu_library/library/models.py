@@ -11,6 +11,7 @@ class Books(models.Model):
     isbn = models.CharField(max_length = 20)
     author = models.CharField(max_length = 100)
     publisher = models.CharField(max_length = 100)
+    num = models.CharField(max_length = 100)
     pic = models.CharField(max_length = 100)
     url = models.CharField(max_length = 60)
     def __unicode__(self):
