@@ -1,8 +1,11 @@
+# -*- coding:utf-8 -*-
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from library.models import *
-from course_reptile.reptile import CourseReptile
+from reptile import CourseReptile
+from solaSpider import solaSpider
 # from library.bookCrawler import getBooksListByName
 
 '''
@@ -33,9 +36,11 @@ def searchByCourse(requset):
         c = Courses.objects.create(cname = course, description = "")
         c.save()
         xml = ""
+        booksNames = booksNames[:1]
         for bookName in booksNames:
             # to be implement. this operation should return a list of dictionary
-            books = getBooksListByName(bookName = bookName, num = 3)
+            sola = solaSpider()
+            books = sola.getBookList(bookName, True)
             # some database operation
             for book in books:
                 # book is a dictionary
@@ -45,7 +50,7 @@ def searchByCourse(requset):
                 # create the relation for this new course and the the relative book
                 r = Relation.objects.create(course = c, bid = bookid, click = 0)
                 r.save()
-        if xml == ""：
+        if xml == "":
             return HttpResponse("No relative book for this course!")
         xml = packXml(xml, c.id, "course")
         return HttpResponse(xml, mimetype="application/xml")
@@ -68,9 +73,9 @@ the following three function search for both course search and book search
 # add the parent node to the xml
 def packXml(xml, sid, search_type):
     head = '''<?xml version="1.0" encoding="UTF-8"?>\n''' +\
-           '''<bookList id = "%d" type = "%s">\n'''
+           '''<bookList>\n'''
     tail = '''</bookList>'''
-    resXml = (head % (sid, search_type)) + xml + tail
+    resXml = head + xml + tail
     return resXml
 
 # create an xml for a book
@@ -80,25 +85,25 @@ def getBookItemXml(bookid):
     except Books.DoesNotExist:
         return ""
     item_xml = '<item>\n' +\
-                   '<name>%s</name>\n' +\
-                   '<pic>%s</pic>\n' +\
-                   '<author>%s</author>\n' +\
-                   '<publisher>%s</publisher>\n' +\
-                   '<isbn>%s</isbn>\n' +\
+                   '<name><![CDATA[%s]]></name>\n' +\
+                   '<pic><![CDATA[%s]]></pic>\n' +\
+                   '<author><![CDATA[%s]]></author>\n' +\
+                   '<publisher><![CDATA[%s]]></publisher>\n' +\
+                   '<isbn><![CDATA[%s]]></isbn>\n' +\
                '</item>\n'
-    item_xml = item_xml % (b.name, b.pic, b.author, b.publisher, b.isbn)
+    item_xml = item_xml % (b.bname, b.pic + "what", b.author, b.publisher, b.isbn + "what")
     return item_xml
 
 # store a book item into database
-# item is a dictionary, has keys : name, pic, author, publisher, isbn, detail
+# item is a dictionary, has keys : bname, pic, author, publisher, isbn, detail
 def storeBookItem(item):
     try:
-        b = Books.objects.get(bname = item.name, author = item.author, num = item.num)
+        b = Books.objects.get(bname = item["bname"], author = item["author"], num = item["num"])
         return b.id
     except:
-    b = Books.objects.create(bname = item.name, publisher = item.publisher,
-                            author = item.author, pic = item.pic,
-                            isbn = item.isbn, url = item.url)
+        b = Books.objects.create(bname = item["bname"], publisher = item["publisher"],
+                            author = item["author"], pic = "", num = item["num"],
+                            isbn = "", url = item["link"])
     b.save()
     return b.id
 
@@ -123,9 +128,9 @@ def searchByBook(requset):
         bookid = storeBookItem(book)
         # construct the return xml
         xml += getBookItemXml(bookid)
-    if xml == ""：
+    if xml == "":
         return HttpResponse("No relative records for this book!")
-    xml = packXml(xml, b.id, "book")
+    xml = packXml(xml, 0, "book")
     return HttpResponse(xml, mimetype="application/xml")
 
 
@@ -148,14 +153,14 @@ def getBookDetail(requset):
     detail = wait_for_xiongtao_get_detail_API(url)
     xml = '''<?xml version="1.0" encoding="UTF-8"?>\n''' +\
             '<book>\n' +\
-                '<name>%s</name>\n' +\
-                '<pic>%s</pic>\n' +\
-                '<author>%s</author>\n' +\
-                '<publisher>%s</publisher>\n' +\
-                '<isbn>%s</isbn>\n' +\
-                '<position>%s</position>\n' +\
-                '<available>%s</available>\n' +\
-                '<digest>%s</digest>\n' +\
+                '<name><![CDATA[%s]]></name>\n' +\
+                '<pic><![CDATA[%s]]></pic>\n' +\
+                '<author><![CDATA[%s]]></author>\n' +\
+                '<publisher><![CDATA[%s]]></publisher>\n' +\
+                '<isbn><![CDATA[%s]]></isbn>\n' +\
+                '<position><![CDATA[%s]]></position>\n' +\
+                '<available><![CDATA[%s]]></available>\n' +\
+                '<digest><![CDATA[%s]]></digest>\n' +\
             '</book>\n'
     xml % (detail.name, detail.pic, detail.author, detail.publisher,
      detail.isbn, detail.position, detail.available, detail.digest)
