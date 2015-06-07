@@ -12,15 +12,28 @@
 
 """
 
+<<<<<<< HEAD
+=======
+__author__ ='patrick'
+
+>>>>>>> 63a601d0eccfe1931f146fe73a65d33dc086296f
 
 import urllib
 import urllib2
 import re
 import json
 import thread
+<<<<<<< HEAD
 
 
 class solaSpider:
+=======
+from django.utils.http import urlquote
+#import Levenshtein
+
+
+class solaSpider(object):
+>>>>>>> 63a601d0eccfe1931f146fe73a65d33dc086296f
     def __init__(self):
         pass
 
@@ -31,7 +44,10 @@ class solaSpider:
         """
 
         self.start_url = "http://202.116.64.108:8991/F/-?func=find-b&find_code=WRD&request="
-        self.start_url += bookName + "&local_base=ZSU01"
+        # solve the encode question
+        # but sometime this function will throw exception
+        # for example, search "计算机网络技术"
+        self.start_url += urlquote(bookName) + "&local_base=ZSU01"
         self.container = []
 
         response = urllib2.urlopen(self.start_url)
@@ -159,7 +175,13 @@ class solaSpider:
     def exact_match(self, bookName):
         tmpContainer = []
         for item in self.container:
+<<<<<<< HEAD
             if item['bname'].upper() == bookName.upper():
+=======
+            #p = Levenshtein.ratio(item['bname'].upper(), bookName.upper())
+            p = 0.95
+            if p >= 0.95:
+>>>>>>> 63a601d0eccfe1931f146fe73a65d33dc086296f
                 tmpContainer.append(item)
         self.container = tmpContainer
 
@@ -215,7 +237,8 @@ if __name__ == '__main__':
     print('-----------------Start crawl----------------------')
     sola = solaSpider()
     books = sola.getBookList(bookName, True)
-    print books
+    for book in books:
+        print book
     print '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
     book = sola.getDetail(books[0]['link'])
     print book
