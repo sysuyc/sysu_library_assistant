@@ -42,6 +42,8 @@ class solaSpider(object):
         result = re.findall('<table class=items.*?>(.*?)</table>', body, re.S)
         for r in result:
             item = {}
+            info = re.findall('<img.*?src="(.*?)">', r, re.S)  # get url of the cover image
+            item['img'] = info[0].strip(' \n')
             info = re.findall('<div class=itemtitle><a href=(.*?)>(.*?)</a>.*?</div>', r, re.S)
             item['bname'] = info[0][1]
             item['link'] = info[0][0]
@@ -59,14 +61,14 @@ class solaSpider(object):
         if accurate == True:
             self.exact_match(bookName)
 
-        '''
+        """
         f = open('books.json', 'a')
         for each_item in self.container:
             tar = json.dumps(each_item, ensure_ascii=False)
             f.write(tar+'\n')
         f.close()
-        '''
         return self.container
+        """
 
 
 
@@ -215,10 +217,10 @@ if __name__ == '__main__':
     """
 
     """
-    bookName = 'Unix环境高级编程'
+    bookName = '数据库管理系统'
     print('-----------------Start crawl----------------------')
     sola = solaSpider()
-    books = sola.getBookList(bookName, True)
+    books = sola.getBookList(bookName, False)
     for book in books:
         print book
     print '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
