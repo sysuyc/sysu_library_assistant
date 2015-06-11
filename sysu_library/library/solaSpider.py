@@ -12,28 +12,15 @@
 
 """
 
-<<<<<<< HEAD
-=======
-__author__ ='patrick'
-
->>>>>>> 63a601d0eccfe1931f146fe73a65d33dc086296f
-
 import urllib
 import urllib2
 import re
 import json
 import thread
-<<<<<<< HEAD
-
-
-class solaSpider:
-=======
 from django.utils.http import urlquote
-#import Levenshtein
 
 
 class solaSpider(object):
->>>>>>> 63a601d0eccfe1931f146fe73a65d33dc086296f
     def __init__(self):
         pass
 
@@ -175,13 +162,7 @@ class solaSpider(object):
     def exact_match(self, bookName):
         tmpContainer = []
         for item in self.container:
-<<<<<<< HEAD
             if item['bname'].upper() == bookName.upper():
-=======
-            #p = Levenshtein.ratio(item['bname'].upper(), bookName.upper())
-            p = 0.95
-            if p >= 0.95:
->>>>>>> 63a601d0eccfe1931f146fe73a65d33dc086296f
                 tmpContainer.append(item)
         self.container = tmpContainer
 
@@ -227,10 +208,11 @@ if __name__ == '__main__':
 
     """
     sola = solaSpider()
-    href = 'http://202.116.64.108:8991/F/DACUPPF1I8NJ2KILX3JAEBCAM2L8S95L3YBQMEJJ6DUPM7GHFE-33671?func=item-global&doc_library=ZSU01&doc_number=000163620&year=&volume=&sub_library='
-    sola.getAllCollections(href)
-    #isbn = '9787111407010'
-    #sola.getFromAPI(isbn)
+    #href = 'http://202.116.64.108:8991/F/KGLKUAIDFFUTUAF2TE9C1YAF8DIVLPYHTAK1UMXB43JAR2DEJ1-06944?func=item-global&doc_library=ZSU01&doc_number=000705779&year=&volume=&sub_library='
+    href = 'http://202.116.64.108:8991/F/KGLKUAIDFFUTUAF2TE9C1YAF8DIVLPYHTAK1UMXB43JAR2DEJ1-08613?func=item-global&doc_library=ZSU01&doc_number=001221035&year=&volume=&sub_library='
+    item = sola.getAllCollections(href)
+    print item
+    """
 
     """
     bookName = 'Unix环境高级编程'
@@ -243,5 +225,6 @@ if __name__ == '__main__':
     book = sola.getDetail(books[0]['link'])
     print book
     print('-----------------End crawl------------------------')
+    """
 
 
