@@ -26,7 +26,7 @@ def searchByCourse(requset):
         c = Courses.objects.get(cname = course)
         # return the historic result
         xml =  getExistCourseRecord(c)
-        return HttpResponse(xml, mimetype="application/xml")
+        return HttpResponse(xml, content_type="application/xml")
     except Courses.DoesNotExist:
         # this course has not been searched before
         # search it, and store the result in database
@@ -48,6 +48,7 @@ def searchByCourse(requset):
             print "search books by book cost : " + repr(time.time() - t1) + "s"
             # some database operation
             for book in books:
+                print book
                 # book is a dictionary
                 bookid = storeBookItem(book)
                 # construct the return xml
@@ -58,7 +59,7 @@ def searchByCourse(requset):
         if xml == "":
             return HttpResponse("No relative book for this course!")
         xml = packXml(xml, c.id, "course")
-        return HttpResponse(xml, mimetype="application/xml")
+        return HttpResponse(xml, content_type="application/xml")
 
 # service for function searchByCourse
 def getExistCourseRecord(course_object):
@@ -96,7 +97,7 @@ def getBookItemXml(bookid):
                    '<publisher><![CDATA[%s]]></publisher>\n' +\
                    '<isbn><![CDATA[%s]]></isbn>\n' +\
                '</item>\n'
-    item_xml = item_xml % (b.bname, b.pic + "what", b.author, b.publisher, b.isbn + "what")
+    item_xml = item_xml % (b.bname, b.pic, b.author, b.publisher, b.isbn)
     return item_xml
 
 # store a book item into database
@@ -107,7 +108,7 @@ def storeBookItem(item):
         return b.id
     except:
         b = Books.objects.create(bname = item["bname"], publisher = item["publisher"],
-                            author = item["author"], pic = "", num = item["num"],
+                            author = item["author"], pic = item["img"], num = item["num"],
                             isbn = "", url = item["link"])
     b.save()
     return b.id
@@ -139,7 +140,7 @@ def searchByBook(requset):
     if xml == "":
         return HttpResponse("No relative records for this book!")
     xml = packXml(xml, 0, "book")
-    return HttpResponse(xml, mimetype="application/xml")
+    return HttpResponse(xml, content_type="application/xml")
 
 
 '''
@@ -182,7 +183,7 @@ def getBookDetail(requset):
         parsekey = signfilter.sub('', key)
         xml += '<%s><![CDATA[%s]]></%s>\n' % (parsekey, contain, parsekey)
     xml = packXml(xml, 0, "book")
-    return HttpResponse(xml, mimetype="application/xml")
+    return HttpResponse(xml, content_type="application/xml")
 
 def clickIncrement(requset):
     # cid means course id
