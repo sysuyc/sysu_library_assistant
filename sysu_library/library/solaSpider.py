@@ -17,6 +17,7 @@ import urllib2
 import re
 import json
 import thread
+import Levenshtein
 from django.utils.http import urlquote
 
 
@@ -35,28 +36,32 @@ class solaSpider(object):
         # but sometime this function will throw exception
         # for example, search "计算机网络技术"
         self.start_url += urlquote(bookName) + "&local_base=ZSU01"
+        #self.start_url += bookName + "&local_base=ZSU01"
         self.container = []
 
         response = urllib2.urlopen(self.start_url)
         body = response.read()
-        result = re.findall('<table class=items.*?>(.*?)</table>', body, re.S)
+        result = re.findall('<table class=items.*?>(.*?)<hr class=itemsep size=1>', body, re.S)
         for r in result:
-            item = {}
-            info = re.findall('<img.*?src="(.*?)">', r, re.S)  # get url of the cover image
-            item['img'] = info[0].strip(' \n')
-            info = re.findall('<div class=itemtitle><a href=(.*?)>(.*?)</a>.*?</div>', r, re.S)
-            item['bname'] = info[0][1]
-            item['link'] = info[0][0]
-            info = re.findall('<td class=content valign=top>(.*?)<', r, re.S)
-            item['author'] = info[0].strip(' \n\r')
-            item['num'] = info[1].strip(' \r\n')
-            item['publisher'] = info[2].strip(' \r\n')
-            item['year'] = info[3].strip(' \r\n')
-            info = re.findall('<b>(.*?)</b>', r, re.S)
-            data = info[0].strip(' ').replace('，', ':').split(':')
-            item['total'] = int(data[1])
-            item['lent'] = int(data[3])
-            self.container.append(item)
+            try:
+                item = {}
+                info = re.findall('<img.*?src="(.*?)">', r, re.S)  # get url of the cover image
+                item['img'] = self.deal_string(info[0])
+                info = re.findall('<div class=itemtitle><a href=(.*?)>(.*?)</a>.*?</div>', r, re.S)
+                item['bname'] = self.deal_string(info[0][1])
+                item['link'] = self.deal_string(info[0][0])
+                info = re.findall('<td class=content valign=top>(.*?)<', r, re.S)
+                item['author'] = self.deal_string(info[0])
+                item['num'] = self.deal_string(info[1])
+                item['publisher'] = self.deal_string(info[2])
+                item['year'] = self.deal_string(info[3])
+                info = re.findall('<b>(.*?)</b>', r, re.S)
+                data = info[0].strip(' ').replace('，', ':').split(':')
+                item['total'] = int(data[1])
+                item['lent'] = int(data[3])
+                self.container.append(item)
+            except:
+                continue
 
         if accurate == True:
             self.exact_match(bookName)
@@ -67,8 +72,8 @@ class solaSpider(object):
             tar = json.dumps(each_item, ensure_ascii=False)
             f.write(tar+'\n')
         f.close()
-        return self.container
         """
+        return self.container
 
 
 
@@ -91,8 +96,6 @@ class solaSpider(object):
             # 单独处理全部馆藏
             if info[0] == '全部馆藏':
                 href = (re.findall('<A HREF=(.*?)>.*?</A>', temp, re.S))[0]
-                print 'cururl ', cururl
-                print 'href', href
                 item[info[0]] = self.getAllCollections(href)
                 continue
 
@@ -101,21 +104,23 @@ class solaSpider(object):
                 if right == "":
                     pre = None
                 else:
-                    item[pre] = item[pre] + '，' + right
+                    item[pre] = self.deal_string(item[pre] + '，' + right)
             else:
                 if item.has_key(info[0]):
                     item[info[0]] += ', ' + right
                 else:
-                    item[info[0]] = right
+                    item[info[0]] = self.deal_string(right)
                 pre = info[0]
 
         if item.has_key('馆藏地:索书'):
             del item['馆藏地:索书']
 
+        """
         f = open('details.json', 'a')
         tar = json.dumps(item, ensure_ascii=False)
         f.write(tar+'\n')
         f.close()
+        """
         return item
 
     def getDetailByISBN(self, isbn):
@@ -162,9 +167,19 @@ class solaSpider(object):
 
 
     def exact_match(self, bookName):
+        """
+        If the book name searced is similar to the target, add to container
+        """
         tmpContainer = []
         for item in self.container:
+            """
             if item['bname'].upper() == bookName.upper():
+                tmpContainer.append(item)
+            """
+            b1 = self.deal_string(item['bname']).replace(' ', '').upper()
+            b2 = bookName.upper()
+            p = Levenshtein.ratio(b1, b2)
+            if p > 0.90:
                 tmpContainer.append(item)
         self.container = tmpContainer
 
@@ -215,18 +230,15 @@ if __name__ == '__main__':
     item = sola.getAllCollections(href)
     print item
     """
-
-    """
-    bookName = '数据库管理系统'
     print('-----------------Start crawl----------------------')
+    bookName = '系统分析'
     sola = solaSpider()
-    books = sola.getBookList(bookName, False)
+    books = sola.getBookList(bookName, True)
     for book in books:
         print book
     print '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
     book = sola.getDetail(books[0]['link'])
     print book
     print('-----------------End crawl------------------------')
-    """
 
 
