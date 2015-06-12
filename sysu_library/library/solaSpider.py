@@ -230,6 +230,7 @@ if __name__ == '__main__':
     item = sola.getAllCollections(href)
     print item
     """
+    """
     print('-----------------Start crawl----------------------')
     bookName = '系统分析'
     sola = solaSpider()
@@ -240,5 +241,6 @@ if __name__ == '__main__':
     book = sola.getDetail(books[0]['link'])
     print book
     print('-----------------End crawl------------------------')
+    """
 
 
