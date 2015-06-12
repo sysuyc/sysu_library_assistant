@@ -63,8 +63,8 @@ class solaSpider(object):
             except:
                 continue
 
-        #if accurate == True:
-           # self.exact_match(bookName)
+        if accurate == True:
+            self.exact_match(bookName)
 
         """
         f = open('books.json', 'a')
