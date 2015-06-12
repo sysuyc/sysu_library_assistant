@@ -58,8 +58,8 @@ class solaSpider(object):
             item['lent'] = int(data[3])
             self.container.append(item)
 
-        if accurate == True:
-            self.exact_match(bookName)
+        #if accurate == True:
+           # self.exact_match(bookName)
 
         """
         f = open('books.json', 'a')
@@ -67,8 +67,8 @@ class solaSpider(object):
             tar = json.dumps(each_item, ensure_ascii=False)
             f.write(tar+'\n')
         f.close()
-        return self.container
         """
+        return self.container
 
 
 

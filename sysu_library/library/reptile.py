@@ -58,8 +58,9 @@ class CourseReptile(object):
             return []
         # solve the encode
         # Nobody should edit this anymore!
+        print 'http://www.baidu.com/s?wd=' + course_name + u'+相关书籍'
         url = 'http://www.baidu.com/s?wd=' + urlquote(course_name + u'+相关书籍')
-        print url
+        # print url
         content = self._get_content(url)
         soup = BeautifulSoup(content.decode('utf-8'))
         title = soup.find('span', title='相关书籍')
