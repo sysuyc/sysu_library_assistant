@@ -6,6 +6,8 @@ from django.shortcuts import render_to_response
 from library.models import *
 from reptile import CourseReptile
 from solaSpider import solaSpider
+import time
+import re
 # from library.bookCrawler import getBooksListByName
 
 '''
@@ -24,25 +26,29 @@ def searchByCourse(requset):
         c = Courses.objects.get(cname = course)
         # return the historic result
         xml =  getExistCourseRecord(c)
-        return HttpResponse(xml, mimetype="application/xml")
+        return HttpResponse(xml, content_type="application/xml")
     except Courses.DoesNotExist:
         # this course has not been searched before
         # search it, and store the result in database
         cr = CourseReptile()
+        t1 = time.time()
         booksNames = cr.course_search(course)
+        print "search books by course cost : " + repr(time.time() - t1) + "s"
         # if not correlated book for this course
         if not len(booksNames):
             return HttpResponse("No relative book for this course!")
         c = Courses.objects.create(cname = course, description = "")
         c.save()
         xml = ""
-        booksNames = booksNames[:1]
         for bookName in booksNames:
             # to be implement. this operation should return a list of dictionary
             sola = solaSpider()
+            t1 = time.time()
             books = sola.getBookList(bookName, True)
+            print "search books by book cost : " + repr(time.time() - t1) + "s"
             # some database operation
             for book in books:
+                print book
                 # book is a dictionary
                 bookid = storeBookItem(book)
                 # construct the return xml
@@ -53,7 +59,7 @@ def searchByCourse(requset):
         if xml == "":
             return HttpResponse("No relative book for this course!")
         xml = packXml(xml, c.id, "course")
-        return HttpResponse(xml, mimetype="application/xml")
+        return HttpResponse(xml, content_type="application/xml")
 
 # service for function searchByCourse
 def getExistCourseRecord(course_object):
@@ -91,7 +97,7 @@ def getBookItemXml(bookid):
                    '<publisher><![CDATA[%s]]></publisher>\n' +\
                    '<isbn><![CDATA[%s]]></isbn>\n' +\
                '</item>\n'
-    item_xml = item_xml % (b.bname, b.pic + "what", b.author, b.publisher, b.isbn + "what")
+    item_xml = item_xml % (b.bname, b.pic, b.author, b.publisher, b.isbn)
     return item_xml
 
 # store a book item into database
@@ -102,7 +108,7 @@ def storeBookItem(item):
         return b.id
     except:
         b = Books.objects.create(bname = item["bname"], publisher = item["publisher"],
-                            author = item["author"], pic = "", num = item["num"],
+                            author = item["author"], pic = item["img"], num = item["num"],
                             isbn = "", url = item["link"])
     b.save()
     return b.id
@@ -118,10 +124,13 @@ will not store the relation in database!
 '''
 def searchByBook(requset):
     bookName = requset.GET.get("book", "")
-    if course == "":
+    if bookName == "":
         return HttpResponse("Request error") 
     # the function getBooksListByName is waiting
-    books = wait_for_xiongtao_get_detail_API(bookName = bookName, num = 30)
+    sola = solaSpider()
+    t1 = time.time()
+    books = sola.getBookList(bookName, False)
+    print "search books by book cost : " + repr(time.time() - t1) + "s"
     xml = ""
     for book in books:
         # book is a dictionary
@@ -131,7 +140,7 @@ def searchByBook(requset):
     if xml == "":
         return HttpResponse("No relative records for this book!")
     xml = packXml(xml, 0, "book")
-    return HttpResponse(xml, mimetype="application/xml")
+    return HttpResponse(xml, content_type="application/xml")
 
 
 '''
@@ -147,24 +156,34 @@ def getBookDetail(requset):
     try:
         b = Books.objects.get(isbn = isbn)
         url = b.url
-    except BooksDoesExist:
+    except Books.DoesNotExist:
         return HttpResponse("ISBN error")
+    # url = 'http://202.116.64.108:8991/F/X2U3STMSYHI5UJI52C9JHPI2LLSUHD8KPXDNLRMEER4QS4LCTQ-44681?func=full-set-set&set_number=097749&set_entry=000006&format=999'
+    # url = 'http://202.116.64.108:8991/F/IL2GHX2DB6D3N31QJK2B8XXI15QXAJYJIEGQN42F84HSUGJQJG-25196?func=full-set-set&set_number=101560&set_entry=000005&format=999'
     # detail is a dictionary
-    detail = wait_for_xiongtao_get_detail_API(url)
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>\n''' +\
-            '<book>\n' +\
-                '<name><![CDATA[%s]]></name>\n' +\
-                '<pic><![CDATA[%s]]></pic>\n' +\
-                '<author><![CDATA[%s]]></author>\n' +\
-                '<publisher><![CDATA[%s]]></publisher>\n' +\
-                '<isbn><![CDATA[%s]]></isbn>\n' +\
-                '<position><![CDATA[%s]]></position>\n' +\
-                '<available><![CDATA[%s]]></available>\n' +\
-                '<digest><![CDATA[%s]]></digest>\n' +\
-            '</book>\n'
-    xml % (detail.name, detail.pic, detail.author, detail.publisher,
-     detail.isbn, detail.position, detail.available, detail.digest)
-    return HttpResponse(xml, mimetype="application/xml")
+    sola = solaSpider()
+    detail = sola.getDetail(url)
+    xml = ""
+    # compare witb key in an unknown code...
+    filt_word = ["形态", "全部馆藏"]
+    htmlfilter = re.compile('<.*?>')
+    signfilter = re.compile('[ :-]')
+    for key in detail:
+        flag = 0
+        for f in filt_word:
+            # but it does work well
+            if f in key:
+                flag = 1
+                break
+        if flag:
+            continue
+        # remove the html part like <span> </span>
+        contain = htmlfilter.sub('', detail[key])
+        # remove : and space and -
+        parsekey = signfilter.sub('', key)
+        xml += '<%s><![CDATA[%s]]></%s>\n' % (parsekey, contain, parsekey)
+    xml = packXml(xml, 0, "book")
+    return HttpResponse(xml, content_type="application/xml")
 
 def clickIncrement(requset):
     # cid means course id
