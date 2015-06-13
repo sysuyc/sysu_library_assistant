@@ -106,7 +106,8 @@ def getBookItemXml(bookid):
                    '<publisher><![CDATA[%s]]></publisher>\n' +\
                    '<isbn><![CDATA[%s]]></isbn>\n' +\
                '</item>\n'
-    item_xml = item_xml % (b.bname, b.pic, b.author, b.publisher, b.isbn)
+    bname = b.bname.replace("&nbsp;:&nbsp;", " ")
+    item_xml = item_xml % (bname, b.pic, b.author, b.publisher, b.isbn)
     return item_xml
 
 # store a book item into database
