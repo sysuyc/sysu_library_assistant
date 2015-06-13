@@ -125,6 +125,13 @@ class solaSpider(object):
         link += isbn + '&local_base=ZSU01'
         return self.getDetail(link)
 
+    def getDetailBySYS(self, SYS):
+        link = 'http://202.116.64.108:8991/F/APVLETD873K7NDX2S1F\
+                TNSXY2RN4FS3TM37C7D4MT8NJTU4BB7-11189?func=find-b\
+                &find_code=SYS&request='
+        link += SYS + '+&local_base=ZSU01'
+        return self.getDetail(link)
+
     def getFromAPI(self, isbn):
         """
         get infos about author from api
