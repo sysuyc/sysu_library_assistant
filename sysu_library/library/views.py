@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from library.models import *
 from reptile import CourseReptile
 from solaSpider import solaSpider
+import Levenshtein
 import time
 import re
 # from library.bookCrawler import getBooksListByName
@@ -39,8 +40,16 @@ def searchByCourse(requset):
             return HttpResponse("No relative book for this course!")
         c = Courses.objects.create(cname = course, description = "")
         c.save()
-        xml = ""
+        # count the similar of bookname and course
+        similarNames = []
         for bookName in booksNames:
+            p = Levenshtein.ratio(bookName, course)
+            similarNames.append((bookName, p))
+        # sort the book names by the similar
+        booksNames = sorted(similarNames, key = lambda x : x[1], reverse = True)
+        print booksNames
+        xml = ""
+        for bookName, p in booksNames:
             # to be implement. this operation should return a list of dictionary
             sola = solaSpider()
             t1 = time.time()
@@ -97,7 +106,8 @@ def getBookItemXml(bookid):
                    '<publisher><![CDATA[%s]]></publisher>\n' +\
                    '<isbn><![CDATA[%s]]></isbn>\n' +\
                '</item>\n'
-    item_xml = item_xml % (b.bname, b.pic, b.author, b.publisher, b.isbn)
+    bname = b.bname.replace("&nbsp;:&nbsp;", " ")
+    item_xml = item_xml % (bname, b.pic, b.author, b.publisher, b.isbn)
     return item_xml
 
 # store a book item into database
@@ -107,9 +117,13 @@ def storeBookItem(item):
         b = Books.objects.get(bname = item["bname"], author = item["author"], num = item["num"])
         return b.id
     except:
+        pat = re.compile("isbn=(.*?)/cover")
+        check = pat.search(item["img"])
+        if check:
+            isbn = check.group(1)
         b = Books.objects.create(bname = item["bname"], publisher = item["publisher"],
                             author = item["author"], pic = item["img"], num = item["num"],
-                            isbn = "", url = item["link"])
+                            isbn = isbn, url = item["link"])
     b.save()
     return b.id
 
@@ -149,12 +163,14 @@ return the detail message for a book by xml
 the augument is isbn, which is the primary key for a book records
 -----------------------------------------------------------------
 '''
-def getBookDetail(requset):
-    isbn = requset.GET.get("isbn", "")
+def getBookDetail(request):
+    isbn = request.GET.get("isbn", "")
+    bname = request.GET.get("bname", "")
+    author = request.GET.get("author", "")
     if isbn == "":
         return HttpResponse("Request error")
     try:
-        b = Books.objects.get(isbn = isbn)
+        b = Books.objects.get(isbn = isbn, bname = bname, author = author)
         url = b.url
     except Books.DoesNotExist:
         return HttpResponse("ISBN error")
