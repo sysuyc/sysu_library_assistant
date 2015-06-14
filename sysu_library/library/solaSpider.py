@@ -64,7 +64,7 @@ class solaSpider(object):
                 continue
 
         if accurate == True:
-            self.exact_match(bookName)
+            self.exact_match(bookName.encode("utf-8"))
 
         """
         f = open('books.json', 'a')
@@ -183,8 +183,8 @@ class solaSpider(object):
             if item['bname'].upper() == bookName.upper():
                 tmpContainer.append(item)
             """
-            b1 = self.deal_string(item['bname']).replace(' ', '').upper()
-            b2 = bookName.upper()
+            b1 = self.deal_string(item['bname']).replace(' ', '')
+            b2 = bookName
             p = Levenshtein.ratio(b1, b2)
             if p > 0.90:
                 tmpContainer.append(item)

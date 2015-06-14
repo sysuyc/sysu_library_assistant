@@ -163,9 +163,9 @@ return the detail message for a book by xml
 the augument is isbn, which is the primary key for a book records
 -----------------------------------------------------------------
 '''
-def getBookDetail(requset):
-    isbn = requset.GET.get("isbn", "")
-    bname = reqeust.GET.get("bname", "")
+def getBookDetail(request):
+    isbn = request.GET.get("isbn", "")
+    bname = request.GET.get("bname", "")
     author = request.GET.get("author", "")
     if isbn == "":
         return HttpResponse("Request error")
