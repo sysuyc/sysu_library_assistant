@@ -1,14 +1,16 @@
-# -*- coding:utf-8 -*-
-
+#*- coding:utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.conf import settings
+from django.core.cache import cache
 from library.models import *
 from reptile import CourseReptile
 from solaSpider import solaSpider
+import correct
+import Levenshtein
 import time
 import re
-# from library.bookCrawler import getBooksListByName
 
 '''
 ------------------------------------
@@ -20,12 +22,20 @@ service for android application
 def searchByCourse(requset):
     course = requset.GET.get("course", "")
     if course == "":
-        return HttpResponse("Request error") 
+        return HttpResponse("Request error")
+    print type(course)
+    course = correct.correct(course)
+    print type(course)
+    xml = cache.get(course)
+    # check whether has some data in redis
+    if xml:
+        return HttpResponse(xml, content_type="application/xml")
     try:
         # check whether this couse is in database
         c = Courses.objects.get(cname = course)
         # return the historic result
         xml =  getExistCourseRecord(c)
+        cache.set(course, xml, 60 * 60 * 24)
         return HttpResponse(xml, content_type="application/xml")
     except Courses.DoesNotExist:
         # this course has not been searched before
@@ -39,8 +49,16 @@ def searchByCourse(requset):
             return HttpResponse("No relative book for this course!")
         c = Courses.objects.create(cname = course, description = "")
         c.save()
-        xml = ""
+        # count the similar of bookname and course
+        similarNames = []
         for bookName in booksNames:
+            p = Levenshtein.ratio(bookName, course)
+            similarNames.append((bookName, p))
+        # sort the book names by the similar
+        booksNames = sorted(similarNames, key = lambda x : x[1], reverse = True)
+        print booksNames
+        xml = ""
+        for bookName, p in booksNames:
             # to be implement. this operation should return a list of dictionary
             sola = solaSpider()
             t1 = time.time()
@@ -59,6 +77,8 @@ def searchByCourse(requset):
         if xml == "":
             return HttpResponse("No relative book for this course!")
         xml = packXml(xml, c.id, "course")
+        # write in cache
+        cache.set(course, xml, 60 * 60 * 24)
         return HttpResponse(xml, content_type="application/xml")
 
 # service for function searchByCourse
@@ -97,7 +117,8 @@ def getBookItemXml(bookid):
                    '<publisher><![CDATA[%s]]></publisher>\n' +\
                    '<isbn><![CDATA[%s]]></isbn>\n' +\
                '</item>\n'
-    item_xml = item_xml % (b.bname, b.pic, b.author, b.publisher, b.isbn)
+    bname = b.bname.replace("&nbsp;:&nbsp;", " ")
+    item_xml = item_xml % (bname, b.pic, b.author, b.publisher, b.isbn)
     return item_xml
 
 # store a book item into database
@@ -107,9 +128,13 @@ def storeBookItem(item):
         b = Books.objects.get(bname = item["bname"], author = item["author"], num = item["num"])
         return b.id
     except:
+        pat = re.compile("isbn=(.*?)/cover")
+        check = pat.search(item["img"])
+        if check:
+            isbn = check.group(1)
         b = Books.objects.create(bname = item["bname"], publisher = item["publisher"],
                             author = item["author"], pic = item["img"], num = item["num"],
-                            isbn = "", url = item["link"])
+                            isbn = isbn, url = item["link"])
     b.save()
     return b.id
 
@@ -126,7 +151,10 @@ def searchByBook(requset):
     bookName = requset.GET.get("book", "")
     if bookName == "":
         return HttpResponse("Request error") 
-    # the function getBooksListByName is waiting
+    # read cache
+    xml = cache.get(bookName)
+    if xml:
+        return HttpResponse(xml, content_type="application/xml")
     sola = solaSpider()
     t1 = time.time()
     books = sola.getBookList(bookName, False)
@@ -140,6 +168,7 @@ def searchByBook(requset):
     if xml == "":
         return HttpResponse("No relative records for this book!")
     xml = packXml(xml, 0, "book")
+    cache.set(bookName, xml, 60 * 60 * 24)
     return HttpResponse(xml, content_type="application/xml")
 
 
@@ -149,12 +178,14 @@ return the detail message for a book by xml
 the augument is isbn, which is the primary key for a book records
 -----------------------------------------------------------------
 '''
-def getBookDetail(requset):
-    isbn = requset.GET.get("isbn", "")
+def getBookDetail(request):
+    isbn = request.GET.get("isbn", "")
+    bname = request.GET.get("bname", "")
+    author = request.GET.get("author", "")
     if isbn == "":
         return HttpResponse("Request error")
     try:
-        b = Books.objects.get(isbn = isbn)
+        b = Books.objects.get(isbn = isbn, bname = bname, author = author)
         url = b.url
     except Books.DoesNotExist:
         return HttpResponse("ISBN error")
