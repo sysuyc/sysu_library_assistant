@@ -58,8 +58,22 @@ WSGI_APPLICATION = 'sysu_library.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'library',
+        'USER': 'root',
+        'PASSWORD': 'yzkk',
+        'HOST':'localhost',
+        'PORT':'28387',
+    }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.cache.RedisCache',
+        'LOCATION': '127.0.0.1:6379',
+        'OPTION': {
+            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+        },
     }
 }
 

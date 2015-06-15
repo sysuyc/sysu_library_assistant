@@ -1,15 +1,15 @@
-# -*- coding:utf-8 -*-
-
+#*- coding:utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.conf import settings
+from django.core.cache import cache
 from library.models import *
 from reptile import CourseReptile
 from solaSpider import solaSpider
 import Levenshtein
 import time
 import re
-# from library.bookCrawler import getBooksListByName
 
 '''
 ------------------------------------
@@ -21,12 +21,17 @@ service for android application
 def searchByCourse(requset):
     course = requset.GET.get("course", "")
     if course == "":
-        return HttpResponse("Request error") 
+        return HttpResponse("Request error")
+    xml = cache.get(course)
+    # check whether has some data in redis
+    if xml:
+        return HttpResponse(xml, content_type="application/xml")
     try:
         # check whether this couse is in database
         c = Courses.objects.get(cname = course)
         # return the historic result
         xml =  getExistCourseRecord(c)
+        cache.set(course, xml, 60 * 60 * 24)
         return HttpResponse(xml, content_type="application/xml")
     except Courses.DoesNotExist:
         # this course has not been searched before
@@ -68,6 +73,8 @@ def searchByCourse(requset):
         if xml == "":
             return HttpResponse("No relative book for this course!")
         xml = packXml(xml, c.id, "course")
+        # write in cache
+        cache.set(course, xml, 60 * 60 * 24)
         return HttpResponse(xml, content_type="application/xml")
 
 # service for function searchByCourse
@@ -140,7 +147,10 @@ def searchByBook(requset):
     bookName = requset.GET.get("book", "")
     if bookName == "":
         return HttpResponse("Request error") 
-    # the function getBooksListByName is waiting
+    # read cache
+    xml = cache.get(bookName)
+    if xml:
+        return HttpResponse(xml, content_type="application/xml")
     sola = solaSpider()
     t1 = time.time()
     books = sola.getBookList(bookName, False)
@@ -154,6 +164,7 @@ def searchByBook(requset):
     if xml == "":
         return HttpResponse("No relative records for this book!")
     xml = packXml(xml, 0, "book")
+    cache.set(bookName, xml, 60 * 60 * 24)
     return HttpResponse(xml, content_type="application/xml")
 
 
