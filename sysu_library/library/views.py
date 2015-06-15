@@ -7,6 +7,7 @@ from django.core.cache import cache
 from library.models import *
 from reptile import CourseReptile
 from solaSpider import solaSpider
+import correct
 import Levenshtein
 import time
 import re
@@ -22,6 +23,9 @@ def searchByCourse(requset):
     course = requset.GET.get("course", "")
     if course == "":
         return HttpResponse("Request error")
+    print type(course)
+    course = correct.correct(course)
+    print type(course)
     xml = cache.get(course)
     # check whether has some data in redis
     if xml:
