@@ -12,4 +12,4 @@ def correct(search_str):
 		return check.group(1)
 
 
-print correct("系统分xi")
+#Example:print correct("系统分xi")
