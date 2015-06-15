@@ -39,7 +39,10 @@ class solaSpider(object):
         #self.start_url += bookName + "&local_base=ZSU01"
         self.container = []
 
-        response = urllib2.urlopen(self.start_url)
+        try:
+            response = urllib2.urlopen(self.start_url)
+        except:
+            return []
         body = response.read()
         result = re.findall('<table class=items.*?>(.*?)<hr class=itemsep size=1>', body, re.S)
         for r in result:
@@ -81,9 +84,14 @@ class solaSpider(object):
         """
         Get the detail of a specified book (link)
         """
-        response = urllib2.urlopen(cururl)
+        try:
+            response = urllib2.urlopen(cururl)
+        except:
+            return {}
         body = response.read()
         result = re.findall('<div class=tabcontent id=details2>(.*?)</div>', body, re.S)
+        if len(result) == 0:
+            return []
         result = re.findall('<tr>(.*?)</tr>', result[0], re.S)
         item = {}
         pre = None
@@ -146,9 +154,14 @@ class solaSpider(object):
         get all collections of a book in the library according to the specified href,
         return a list of dictionary : [{}, {}, {}...]
         """
-        response = urllib2.urlopen(href)
+        try:
+            response = urllib2.urlopen(href)
+        except:
+            return []
         body = response.read()
         table = re.findall('<table border=0 cellspacing=2 width=99%>(.*?)</table>', body, re.S)
+        if len(table) == 0:
+            return []
         table[0] = self.undo_the_comment(table[0])
         firstRow = re.findall('<tr class=tr1>(.*?)</tr>', table[0], re.S)
         title = re.findall('<th class="text3">(.*?)</th>', firstRow[0], re.S)
@@ -223,13 +236,11 @@ class solaSpider(object):
 
 if __name__ == '__main__':
 
-    """
     sola = solaSpider()
     #href = 'http://202.116.64.108:8991/F/KGLKUAIDFFUTUAF2TE9C1YAF8DIVLPYHTAK1UMXB43JAR2DEJ1-06944?func=item-global&doc_library=ZSU01&doc_number=000705779&year=&volume=&sub_library='
     href = 'http://202.116.64.108:8991/F/KGLKUAIDFFUTUAF2TE9C1YAF8DIVLPYHTAK1UMXB43JAR2DEJ1-08613?func=item-global&doc_library=ZSU01&doc_number=001221035&year=&volume=&sub_library='
     item = sola.getAllCollections(href)
     print item
-    """
     """
     print('-----------------Start crawl----------------------')
     bookName = '系统分析'
