@@ -116,9 +116,11 @@ def getBookItemXml(bookid):
                    '<author><![CDATA[%s]]></author>\n' +\
                    '<publisher><![CDATA[%s]]></publisher>\n' +\
                    '<isbn><![CDATA[%s]]></isbn>\n' +\
+                   '<url><![CDATA[%s]]></url>\n' +\
                '</item>\n'
     bname = b.bname.replace("&nbsp;:&nbsp;", " ")
-    item_xml = item_xml % (bname, b.pic, b.author, b.publisher, b.isbn)
+    print b.url + "    in get"
+    item_xml = item_xml % (bname, b.pic, b.author, b.publisher, b.isbn, b.url)
     return item_xml
 
 # store a book item into database
@@ -128,13 +130,9 @@ def storeBookItem(item):
         b = Books.objects.get(bname = item["bname"], author = item["author"], num = item["num"])
         return b.id
     except:
-        pat = re.compile("isbn=(.*?)/cover")
-        check = pat.search(item["img"])
-        if check:
-            isbn = check.group(1)
         b = Books.objects.create(bname = item["bname"], publisher = item["publisher"],
                             author = item["author"], pic = item["img"], num = item["num"],
-                            isbn = isbn, url = item["link"])
+                            isbn = item["isbn"], url = item["link"])
     b.save()
     return b.id
 
@@ -194,9 +192,22 @@ def getBookDetail(request):
     # detail is a dictionary
     sola = solaSpider()
     detail = sola.getDetail(url)
+    print detail
+    if len(detail) == 0:
+        books = sola.getBookList(bname, False)
+        for book in books:
+            if book["bname"] == bname and book["author"] == author:
+                url = book["link"]
+                break
+        print "new url"
+        print url
+        b.url = url
+        b.save()
+        detail = sola.getDetail(url)
     xml = ""
     # compare witb key in an unknown code...
     filt_word = ["形态", "全部馆藏"]
+    collect = "全部馆藏"
     htmlfilter = re.compile('<.*?>')
     signfilter = re.compile('[ :-]')
     for key in detail:
@@ -213,6 +224,20 @@ def getBookDetail(request):
         # remove : and space and -
         parsekey = signfilter.sub('', key)
         xml += '<%s><![CDATA[%s]]></%s>\n' % (parsekey, contain, parsekey)
+    for key in detail:
+        if collect in key:
+            msg = detail[key]
+            collect_xml = "<馆藏状态>\n"
+            for m in msg:
+                item = "<子项>\n" +\
+                        "<应还日期><![CDATA[%s]]></应还日期>\n" +\
+                        "<馆藏地><![CDATA[%s]]></馆藏地>\n" +\
+                        "<架位><![CDATA[%s]]></架位>\n" +\
+                        "</子项>\n"
+                item = item % (m["应还日期"], m["馆藏地"], m["架位"])
+                collect_xml += item
+            collect_xml = collect_xml + "</馆藏状态>\n"
+    xml += collect_xml
     xml = packXml(xml, 0, "book")
     return HttpResponse(xml, content_type="application/xml")
 
