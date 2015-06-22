@@ -144,11 +144,9 @@ class solaSpider(object):
             {}
         body = reponse.read()
         result = re.findall('<form.*?action="(.*?)".*?>', body, re.S)
-        print result
         if len(result) == 0:
             return {}
         link = result[0] + '?func=find-b&find_code=ISB&request=' + isbn + '&local_base=ZSU01'
-        print link
         return self.getDetail(link)
 
     def getDetailBySYS(self, SYS):
