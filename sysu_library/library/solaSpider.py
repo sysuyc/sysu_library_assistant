@@ -18,6 +18,7 @@ import re
 import json
 import thread
 import Levenshtein
+from datetime import date
 from django.utils.http import urlquote
 
 
@@ -191,11 +192,84 @@ class solaSpider(object):
             dic = {}
             for idx, col in enumerate(cols):
                 if idx == 0:
+                    book_info = re.findall('<a href=.*doc_number=(.*?)&item_sequence=(.*?)&.*>', col.lower(), re.S)
+                    # print col.lower()
+                    # print book_info
+                    available = re.findall('(预约)', col.lower(), re.S)
+                    if available:
+                        dic['available'] = "Y"
+                    else:
+                        dic['available'] = "N"
+                    dic['doc_number'] = book_info[0][0]
+                    dic['item_sequence'] = book_info[0][1]
                     continue
                 dic[title[idx]] = col
             result.append(dic)
         return result
 
+    def login(self, bid, password):
+        """
+        Login by the id and password.
+        If successful login, return the characteristic code on the url.
+        If login failed, return None.
+        """
+        if not bid or not password:
+            return None
+        login_data = {
+            'func' : 'login-session',
+            'login_source' : 'bor_info',
+            'bor_id' : bid,
+            'bor_verification' : password,
+            'bor_library' : 'ZSU50'
+        }
+        unique_code = self.get_unique_code()
+        login_url = 'http://202.116.64.108:8991/F/'+unique_code
+        response = urllib2.urlopen(login_url, urllib.urlencode(login_data))
+        html = response.read()
+        match_result = re.findall('(退出)', html, re.S)
+        if not match_result:
+            return None
+        else:
+            return unique_code
+
+    def book_appointment(self, unique_code, doc_number, item_sequence, pickup, end_time):
+        """
+        预约书籍。
+        """
+        if not unique_code or not doc_number or not item_sequence or not location or not end_time:
+            return None
+        appointment_url = 'http://202.116.64.108:8991/F/%s-?func=item-hold-request&doc_library=ZSU50&adm_doc_number=%s&item_sequence=%s&year=&volume=&sub_library=&type=&no_loaned=N&start_rec_key=&end_rec_key=' % (unique_code, doc_number, item_sequence)
+        today = date.today().strftime('%Y%m%d')
+        post_data = {
+            'func' : 'item-hold-request-b',
+            'doc_library' : 'ZSU50',
+            'adm_doc_number' : doc_number,
+            'item_sequence' : item_sequence,
+            'bib_request' : 'N',
+            'PICKUP' : pickup,
+            'from' : today,
+            'to' : end_time,
+            'rush_request' : 'N'
+        }
+        response = urllib2.urlopen(appointment_url, urllib.urlencode(post_data))
+        html = response.read()
+        res = re.findall('(预约请求已发送)', html, re.S)
+        if not res:
+            print 'Failed!'
+            return None
+        else:
+            print 'Success'
+            return 'Success'
+
+    def get_unique_code(self):
+        login_page_url = 'http://202.116.64.108:8991/F/?func=file&file_name=login-session'
+        response = urllib2.urlopen(login_page_url)
+        html = response.read()
+        res = re.findall(r'<form .*action=.*/F/(.*?)-.*>', html, re.S)
+        if not res:
+            return None
+        unique_code = res[0]
+        return unique_code
 
     def exact_match(self, bookName):
         """
@@ -251,12 +325,22 @@ class solaSpider(object):
         s = s.strip(' \r\n');
         return s
 
+def beautiful_print(items):
+    for item in items:
+        for k in item:
+            print k, ':', item[k]
+        print
 
 if __name__ == '__main__':
 
+    """
     sola = solaSpider()
-    isbn = '978-7-302-35628-8'
-    book = sola.getDetailByISBN(isbn)
-    print book
+    href = 'http://202.116.64.108:8991/F/?func=item-global&doc_library=ZSU01&doc_number=000818425&year=&volume=&sub_library='
+    item = sola.getAllCollections(href)
+    beautiful_print(item)
+    """
+    # unique_code = sola.login('12330049', 'yingcong')
+    # if unique_code:
+    #     sola.book_appointment(unique_code, '000818425', '000060', 'DXLT', '20150723')
 
 
