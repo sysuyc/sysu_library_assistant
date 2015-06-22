@@ -51,9 +51,13 @@ class solaSpider(object):
                 item = {}
                 info = re.findall('<img.*?src="(.*?)">', r, re.S)  # get url of the cover image
                 item['img'] = self.deal_string(info[0])
+                pat = re.compile("isbn=(.*?)/cover")
+                item['isbn'] = pat.search(r).group(1)
                 info = re.findall('<div class=itemtitle><a href=(.*?)>(.*?)</a>.*?</div>', r, re.S)
                 item['bname'] = self.deal_string(info[0][1])
-                item['link'] = self.deal_string(info[0][0])
+                pat = re.compile("<div class=itemtitle><a href=(.*?)>")
+                # item['link'] = self.deal_string(info[0][0])
+                item['link'] = pat.search(r).group(1)
                 info = re.findall('<td class=content valign=top>(.*?)<', r, re.S)
                 item['author'] = self.deal_string(info[0])
                 item['num'] = self.deal_string(info[1])

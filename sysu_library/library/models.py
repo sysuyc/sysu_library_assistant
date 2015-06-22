@@ -13,7 +13,7 @@ class Books(models.Model):
     publisher = models.CharField(max_length = 100)
     num = models.CharField(max_length = 100)
     pic = models.CharField(max_length = 100)
-    url = models.CharField(max_length = 60)
+    url = models.CharField(max_length = 1024)
     def __unicode__(self):
         return "Book name : " + bname + "\nauthor : " + author + "\npublisher : " + publisher
 
