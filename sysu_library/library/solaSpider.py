@@ -36,6 +36,7 @@ class solaSpider(object):
         # but sometime this function will throw exception
         # for example, search "计算机网络技术"
         self.start_url += urlquote(bookName) + "&local_base=ZSU01"
+        print self.start_url
         #self.start_url += bookName + "&local_base=ZSU01"
         self.container = []
 
@@ -132,10 +133,18 @@ class solaSpider(object):
         return item
 
     def getDetailByISBN(self, isbn):
-        link = 'http://202.116.64.108:8991/F/93TMKDTYCMCYUXHM2T8\
-                HPD3MSVS9K1GUI3RFE8AJU8H69HY35S-05843?func=find-\
-                b&find_code=ISB&request='
-        link += isbn + '&local_base=ZSU01'
+        link = 'http://202.116.64.108:8991/F/'
+        try:
+            reponse = urllib2.urlopen(link)
+        except:
+            {}
+        body = reponse.read()
+        result = re.findall('<form.*?action="(.*?)".*?>', body, re.S)
+        print result
+        if len(result) == 0:
+            return {}
+        link = result[0] + '?func=find-b&find_code=ISB&request=' + isbn + '&local_base=ZSU01'
+        print link
         return self.getDetail(link)
 
     def getDetailBySYS(self, SYS):
@@ -244,21 +253,8 @@ class solaSpider(object):
 if __name__ == '__main__':
 
     sola = solaSpider()
-    #href = 'http://202.116.64.108:8991/F/KGLKUAIDFFUTUAF2TE9C1YAF8DIVLPYHTAK1UMXB43JAR2DEJ1-06944?func=item-global&doc_library=ZSU01&doc_number=000705779&year=&volume=&sub_library='
-    href = 'http://202.116.64.108:8991/F/KGLKUAIDFFUTUAF2TE9C1YAF8DIVLPYHTAK1UMXB43JAR2DEJ1-08613?func=item-global&doc_library=ZSU01&doc_number=001221035&year=&volume=&sub_library='
-    item = sola.getAllCollections(href)
-    print item
-    """
-    print('-----------------Start crawl----------------------')
-    bookName = '系统分析'
-    sola = solaSpider()
-    books = sola.getBookList(bookName, True)
-    for book in books:
-        print book
-    print '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
-    book = sola.getDetail(books[0]['link'])
+    isbn = '978-7-302-35628-8'
+    book = sola.getDetailByISBN(isbn)
     print book
-    print('-----------------End crawl------------------------')
-    """
 
 
