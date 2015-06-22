@@ -233,10 +233,11 @@ def getBookDetail(request):
                         "<应还日期><![CDATA[%s]]></应还日期>\n" +\
                         "<馆藏地><![CDATA[%s]]></馆藏地>\n" +\
                         "<架位><![CDATA[%s]]></架位>\n" +\
+                        "<available><![CDATA[%s]]></available>\n" +\
                         "<doc_number><![CDATA[%s]]></doc_number>\n" +\
                         "<item_sequence><![CDATA[%s]]></item_sequence>\n" +\
                         "</子项>\n"
-                item = item % (m["应还日期"], m["馆藏地"], m["架位"], m["doc_number"], m["item_sequence"])
+                item = item % (m["应还日期"], m["馆藏地"], m["架位"], m["available"], m["doc_number"], m["item_sequence"])
                 collect_xml += item
             collect_xml = collect_xml + "</馆藏状态>\n"
     xml += collect_xml

@@ -188,6 +188,11 @@ class solaSpider(object):
                     book_info = re.findall('<a href=.*doc_number=(.*?)&item_sequence=(.*?)&.*>', col.lower(), re.S) 
                     # print col.lower()
                     # print book_info
+                    available = re.findall('(预约)', col.lower(), re.S)
+                    if available:
+                        dic['available'] = "Y"
+                    else:
+                        dic['available'] = "N"
                     dic['doc_number'] = book_info[0][0]
                     dic['item_sequence'] = book_info[0][1]
                     continue
