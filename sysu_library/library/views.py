@@ -26,7 +26,7 @@ def searchByCourse(requset):
     print type(course)
     course = correct.correct(course)
     print type(course)
-    xml = cache.get(course)
+    xml = cache.get("C_" + course)
     # check whether has some data in redis
     if xml:
         return HttpResponse(xml, content_type="application/xml")
@@ -35,7 +35,7 @@ def searchByCourse(requset):
         c = Courses.objects.get(cname = course)
         # return the historic result
         xml =  getExistCourseRecord(c)
-        cache.set(course, xml, 60 * 60 * 24)
+        cache.set("C_" + course, xml, 60 * 60 * 24)
         return HttpResponse(xml, content_type="application/xml")
     except Courses.DoesNotExist:
         # this course has not been searched before
@@ -78,7 +78,7 @@ def searchByCourse(requset):
             return HttpResponse("No relative book for this course!")
         xml = packXml(xml, c.id, "course")
         # write in cache
-        cache.set(course, xml, 60 * 60 * 24)
+        cache.set("C_" + course, xml, 60 * 60 * 24)
         return HttpResponse(xml, content_type="application/xml")
 
 # service for function searchByCourse
@@ -150,7 +150,7 @@ def searchByBook(requset):
     if bookName == "":
         return HttpResponse("Request error") 
     # read cache
-    xml = cache.get(bookName)
+    xml = cache.get("B_" + bookName)
     if xml:
         return HttpResponse(xml, content_type="application/xml")
     sola = solaSpider()
@@ -166,7 +166,7 @@ def searchByBook(requset):
     if xml == "":
         return HttpResponse("No relative records for this book!")
     xml = packXml(xml, 0, "book")
-    cache.set(bookName, xml, 60 * 60 * 24)
+    cache.set("B_" + bookName, xml, 60 * 60 * 24)
     return HttpResponse(xml, content_type="application/xml")
 
 
@@ -233,8 +233,10 @@ def getBookDetail(request):
                         "<应还日期><![CDATA[%s]]></应还日期>\n" +\
                         "<馆藏地><![CDATA[%s]]></馆藏地>\n" +\
                         "<架位><![CDATA[%s]]></架位>\n" +\
+                        "<doc_number><![CDATA[%s]]></doc_number>\n" +\
+                        "<item_sequence><![CDATA[%s]]></item_sequence>\n" +\
                         "</子项>\n"
-                item = item % (m["应还日期"], m["馆藏地"], m["架位"])
+                item = item % (m["应还日期"], m["馆藏地"], m["架位"], m["doc_number"], m["item_sequence"])
                 collect_xml += item
             collect_xml = collect_xml + "</馆藏状态>\n"
     xml += collect_xml
@@ -255,3 +257,32 @@ def clickIncrement(requset):
     except:
         return HttpResponse("Relation error")
     return HttpResponse("Request error")
+
+def login(request):
+    username = request.GET.get('username')
+    password = request.GET.get('password')
+    if not username or not password:
+        return HttpResponse('Failed: username and password are needed')
+    sola = solaSpider()
+    unique_code = sola.login(username, password)
+    if not unique_code:
+        return HttpResponse("Failed: check your account")
+    return HttpResponse("Success: " + unique_code)
+    
+
+def bookAppointment(request):
+    username = request.GET.get('username')
+    password = request.GET.get('password')
+    doc_number = request.GET.get('doc_number')
+    item_sequence = request.GET.get('item_sequence')
+    pickup = request.GET.get('pickup')
+    end_time = request.GET.get('end_time')
+    sola = solaSpider()
+    unique_code = sola.login(username, password)
+    if not unique_code:
+        return HttpResponse('Failed: check your account')
+    success = sola. book_appointment(unique_code, doc_number, item_sequence, pickup, end_time)
+    if not success:
+        return HttpResponse('Failed: counld not make an appointment')
+    return HttpResponse('Success: make the appointment successful')
+

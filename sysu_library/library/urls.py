@@ -9,4 +9,6 @@ urlpatterns = patterns('',
     url(r'^book/', searchByBook),
     url(r'^detail/', getBookDetail),
     url(r'^click/', clickIncrement),
+    url(r'^login/', login),
+    url(r'^appointment/', bookAppointment),
 )
