@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">图书小助手</string>
+    <string name="hello_world">图书小助手</string>
+    <string name="studentid">学号:</string>
+    <string name="password">密码:</string>
+    <string name="action_settings">Settings</string>
+    <string name="scan_text">请将方框对准条形码进行扫描。</string>
+
+</resources>
