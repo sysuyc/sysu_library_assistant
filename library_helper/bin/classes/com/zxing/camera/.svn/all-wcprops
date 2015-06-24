@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/svn/%E7%BD%91%E7%BB%9C%E7%B1%BB/!svn/ver/506/%E4%B8%9A%E5%8A%A1%E5%91%98%E6%89%8B%E6%9C%BAAPP/CourierBusiness/src/com/zxing/camera
+END
+AutoFocusCallback.java
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svn/%E7%BD%91%E7%BB%9C%E7%B1%BB/!svn/ver/506/%E4%B8%9A%E5%8A%A1%E5%91%98%E6%89%8B%E6%9C%BAAPP/CourierBusiness/src/com/zxing/camera/AutoFocusCallback.java
+END
+PreviewCallback.java
+K 25
+svn:wc:ra_dav:version-url
+V 152
+/svn/%E7%BD%91%E7%BB%9C%E7%B1%BB/!svn/ver/506/%E4%B8%9A%E5%8A%A1%E5%91%98%E6%89%8B%E6%9C%BAAPP/CourierBusiness/src/com/zxing/camera/PreviewCallback.java
+END
+CameraConfigurationManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 163
+/svn/%E7%BD%91%E7%BB%9C%E7%B1%BB/!svn/ver/506/%E4%B8%9A%E5%8A%A1%E5%91%98%E6%89%8B%E6%9C%BAAPP/CourierBusiness/src/com/zxing/camera/CameraConfigurationManager.java
+END
+CameraManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 150
+/svn/%E7%BD%91%E7%BB%9C%E7%B1%BB/!svn/ver/506/%E4%B8%9A%E5%8A%A1%E5%91%98%E6%89%8B%E6%9C%BAAPP/CourierBusiness/src/com/zxing/camera/CameraManager.java
+END
+FlashlightManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svn/%E7%BD%91%E7%BB%9C%E7%B1%BB/!svn/ver/506/%E4%B8%9A%E5%8A%A1%E5%91%98%E6%89%8B%E6%9C%BAAPP/CourierBusiness/src/com/zxing/camera/FlashlightManager.java
+END
+PlanarYUVLuminanceSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 161
+/svn/%E7%BD%91%E7%BB%9C%E7%B1%BB/!svn/ver/506/%E4%B8%9A%E5%8A%A1%E5%91%98%E6%89%8B%E6%9C%BAAPP/CourierBusiness/src/com/zxing/camera/PlanarYUVLuminanceSource.java
+END

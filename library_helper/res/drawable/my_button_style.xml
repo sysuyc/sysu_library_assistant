@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+    <!--点击背景-->  
+    <item android:state_pressed="true">  
+        <shape>  
+            <!--色值-->  
+            <solid android:color="#EEEEEE" />  
+            <!--圆角-->  
+            <corners android:radius="3dp" />  
+            <!--边框-->
+            <stroke android:width="0.2dp" android:color="@android:color/black" />    
+         </shape>  
+    </item>  
+    <!--默认背景-->  
+    <item>  
+        <shape>  
+            <!--色值-->  
+            <solid android:color="@android:color/white" />  
+            <!--圆角-->  
+            <corners android:radius="3dp" />  
+            <!--边框-->
+            <stroke android:width="0.2dp" android:color="@android:color/black" />    
+         </shape>  
+    </item>  
+</selector>
