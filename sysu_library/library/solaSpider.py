@@ -236,7 +236,7 @@ class solaSpider(object):
         """
         预约书籍。
         """
-        if not unique_code or not doc_number or not item_sequence or not location or not end_time:
+        if not unique_code or not doc_number or not item_sequence or not pickup or not end_time:
             return None
         appointment_url = 'http://202.116.64.108:8991/F/%s-?func=item-hold-request&doc_library=ZSU50&adm_doc_number=%s&item_sequence=%s&year=&volume=&sub_library=&type=&no_loaned=N&start_rec_key=&end_rec_key=' % (unique_code, doc_number, item_sequence)
         today = date.today().strftime('%Y%m%d')
