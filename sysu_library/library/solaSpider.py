@@ -148,7 +148,9 @@ class solaSpider(object):
         if len(result) == 0:
             return {}
         link = result[0] + '?func=find-b&find_code=ISB&request=' + isbn + '&local_base=ZSU01'
-        return self.getDetail(link)
+        book = self.getDetail(link)
+        book['img'] = 'http://202.112.150.126/index.php?client=aleph&isbn=' + isbn + '/cover'
+        return book
 
     def getDetailBySYS(self, SYS):
         link = 'http://202.116.64.108:8991/F/APVLETD873K7NDX2S1F\
@@ -335,10 +337,10 @@ if __name__ == '__main__':
 
     """
     sola = solaSpider()
-    href = 'http://202.116.64.108:8991/F/?func=item-global&doc_library=ZSU01&doc_number=000818425&year=&volume=&sub_library='
-    item = sola.getAllCollections(href)
-    beautiful_print(item)
+    book = sola.getDetailByISBN('7-302-12760-3')
+    print book
     """
+
     # unique_code = sola.login('12330049', 'yingcong')
     # if unique_code:
     #     sola.book_appointment(unique_code, '000818425', '000060', 'DXLT', '20150723')
