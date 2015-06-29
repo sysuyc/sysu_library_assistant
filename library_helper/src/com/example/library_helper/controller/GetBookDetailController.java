@@ -400,25 +400,6 @@ public class GetBookDetailController {
 				    		if(_state != null) {
 				    			_state.put("item_sequence", str);
 				    		}
-				    	} else if("img".equals(tagName)) {
-				    		String str = parser.nextText();
-				    		int pos1 = 0, pos2 = str.length(), temp = 0;
-				    		
-				    		temp = str.indexOf("<![CDATA[");
-				    		if(temp != -1) {
-				    			pos1 = temp + "<![CDATA[".length();
-				    		}
-				    		
-				    		temp = str.lastIndexOf("]]");
-				    		if(temp != -1) {
-				    			pos2 = temp;
-				    		}
-				    		
-				    		String _pic = str.substring(pos1, pos2);
-				    		if(bd != null) {
-				    			bd.setPic(_pic);
-				    		}
-				    		
 				    	}
 				    	
 				    	break;

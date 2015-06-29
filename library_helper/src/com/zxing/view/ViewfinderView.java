@@ -218,7 +218,7 @@ public final class ViewfinderView extends View {
             
             //modify
             //»­É¨Ãè¿òÏÂÃæµÄ×Ö  
-            paint.setColor(Color.GREEN);  
+            paint.setColor(Color.WHITE);  
             paint.setTextSize(TEXT_SIZE * density);  
             paint.setAlpha(0x40);  
             paint.setTypeface(Typeface.DEFAULT_BOLD);   
