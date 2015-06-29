@@ -121,7 +121,6 @@ public class result_activity extends Activity{
 			
 			@Override
 			public void onCheckedChanged(RadioGroup arg0, int arg1) {
-				// TODO Auto-generated method stub
 				if(arg1  == R.id.radioButton1)
 				{
 					//选择了课程
@@ -144,7 +143,6 @@ public class result_activity extends Activity{
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				//点击搜索按钮更新列表内容
 				if(search_type == 1 || search_type == 2) {
 					//search
@@ -179,7 +177,7 @@ public class result_activity extends Activity{
 
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) {			// TODO Auto-generated method stub
+				long arg3) {			
 			
 			Bundle mBundle = new Bundle();
 			mBundle.putBoolean("isByIsbn", false);

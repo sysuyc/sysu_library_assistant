@@ -31,14 +31,11 @@ import android.util.Xml;
 import android.widget.Toast;
 
 public class InternetSearchController {
-	//private final String search_by_course_url = "http://172.18.187.83:8000/lib/course/?course=";
-	//private final String search_by_bookname_url = "http://172.18.187.83:8000/lib/book/?book=";
 	private final String search_by_course_url = "http://172.18.187.107:8005/lib/course/?course=";
 	private final String search_by_bookname_url = "http://172.18.187.107:8005/lib/book/?book=";
 	private List<Book> result_list;
 	
 	public InternetSearchController() {
-		// TODO Auto-generated constructor stub
 		result_list = new ArrayList<Book>();
 	}
 	
@@ -63,7 +60,6 @@ public class InternetSearchController {
 		List<Book> books = null;
 		Map<String, List<Book>> result = new HashMap<String, List<Book>>();
 		
-		// TODO Auto-generated method stub
 		try {
 			//执行网络连接以及解析代码
 			//get方法
@@ -114,7 +110,6 @@ public class InternetSearchController {
 		List<Book> books = null;
 		Map<String, List<Book>> result = new HashMap<String, List<Book>>();
 		
-		// TODO Auto-generated method stub
 		try {
 			//执行网络连接以及解析代码
 			//get方法

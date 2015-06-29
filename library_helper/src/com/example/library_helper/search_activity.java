@@ -122,7 +122,6 @@ public class search_activity extends Activity{
 			
 			@Override
 			public void onCheckedChanged(RadioGroup arg0, int arg1) {
-				// TODO Auto-generated method stub
 				if(arg1 == R.id.radioButton1) {					
 					//Ñ¡ÔñÁË¿Î³Ì
 					search_type = 1;
@@ -146,7 +145,6 @@ public class search_activity extends Activity{
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				//search
 				if(search_type == 1 || search_type == 2) {
 					//search
@@ -176,7 +174,6 @@ public class search_activity extends Activity{
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				launchScanningActivity();
 			}
 		});
