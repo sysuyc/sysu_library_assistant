@@ -106,14 +106,14 @@ public class ImageAdapter extends BaseAdapter implements OnScrollListener {
 		if(imgUrl != null && !imgUrl.equals("")) {
 			if(!scrolling) {
 				ImageListener listener = ImageLoader.getImageListener(holder.cover,
-						R.drawable.ic_launcher, R.drawable.ic_launcher);
+						R.drawable.ic_launcher, R.drawable.ic_launch);
 				
 				//Log.i("position", String.valueOf(position));
 				//Log.i("url", imgUrl);
 				
 				//imageLoader.get(imgUrl, listener);
 				holder.cover.setDefaultImageResId(R.drawable.ic_launcher);  
-				holder.cover.setErrorImageResId(R.drawable.ic_launcher);  
+				holder.cover.setErrorImageResId(R.drawable.ic_launch);  
 				holder.cover.setImageUrl(imgUrl, imageLoader); 
 			}
 

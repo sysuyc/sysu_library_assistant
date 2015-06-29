@@ -21,12 +21,13 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	private Intent mIntent;
 	private Button loginbtn;
-	private Button travelerbtn;
-	private Button clearHisbtn;
+	private TextView travelerbtn;
+	private TextView clearHisbtn;
 	private TextView forgetbtn;
 	private EditText stuid,password;
 	private SharedPreferences sp ;
@@ -57,7 +58,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		travelerbtn = (Button)this.findViewById(R.id.travelerBtn);
+		travelerbtn = (TextView)this.findViewById(R.id.travelerBtn);
 		travelerbtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -73,7 +74,7 @@ public class MainActivity extends Activity {
 		});
 		
 		mController = new DBSearchController(this.getApplicationContext());
-		clearHisbtn = (Button)this.findViewById(R.id.clearHisBtn);
+		clearHisbtn = (TextView)this.findViewById(R.id.clearHisBtn);
 		clearHisbtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -82,6 +83,7 @@ public class MainActivity extends Activity {
 				//mController.clear("course");
 				//mController.clear("bookname");
 				mController.clearAll();
+				Toast.makeText(MainActivity.this, "Çå³ýÀúÊ·»º´æ", Toast.LENGTH_SHORT).show();
 			}
 		});
 		

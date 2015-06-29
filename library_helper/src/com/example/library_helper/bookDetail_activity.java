@@ -130,7 +130,9 @@ public class bookDetail_activity extends Activity {
         		if(msg.what == 1) {
         			detail = (BookDetail)msg.obj;
             		if(detail != null) {
-            			detail.setPic(mBundle.getString("pic"));
+            			if(mBundle.getString("pic") != null && !mBundle.getString("pic").equals("")) {
+            				detail.setPic(mBundle.getString("pic"));
+            			}
             			String bn = detail.getName();
             			String au = detail.getAuthor();
             			String pub = detail.getPublisher();
@@ -165,9 +167,10 @@ public class bookDetail_activity extends Activity {
             			
             			
             			String imgUrl = detail.getPic();
+            			//Toast.makeText(bookDetail_activity.this, imgUrl, Toast.LENGTH_SHORT).show();
             			if(imgUrl != null && !imgUrl.equals("")) {
             				ImageListener listener = ImageLoader.getImageListener(bookCoverImageView,
-        							R.drawable.ic_launcher, R.drawable.ic_launcher);
+        							R.drawable.ic_launcher, R.drawable.ic_launch);
         					imageLoader.get(imgUrl, listener);            					
  
             			} else {

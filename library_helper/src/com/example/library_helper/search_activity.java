@@ -159,7 +159,7 @@ public class search_activity extends Activity{
 						sc.setSearchType(search_type);
 						sc.setSearchItem(sitem);
 						
-						mProgressDialog = ProgressDialog.show(search_activity.this, "Requesting", "Requesting...");
+						mProgressDialog = ProgressDialog.show(search_activity.this, "搜索", "正在查询中...");
 						executorService.submit(sc);
 						
 					}
@@ -199,7 +199,7 @@ public class search_activity extends Activity{
         if(resultCode == RESULT_OK){                         //判断回调	
             Bundle bundle = data.getExtras();
             String scanResult = bundle.getString("result");  //这就获取了扫描的内容了
-            Toast.makeText(search_activity.this, scanResult, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(search_activity.this, scanResult, Toast.LENGTH_SHORT).show();
             
             Bundle mBundle = new Bundle();
 			mBundle.putBoolean("isByIsbn", true);
