@@ -157,7 +157,7 @@ public class result_activity extends Activity{
 						sc.setSearchType(search_type);
 						sc.setSearchItem(sitem);
 						
-						mProgressDialog = ProgressDialog.show(result_activity.this, "Requesting", "Requesting...");
+						mProgressDialog = ProgressDialog.show(result_activity.this, "查询", "正在打开页面，喝杯茶休息一下...");
 						executorService.submit(sc);
 					}
 				} else {
