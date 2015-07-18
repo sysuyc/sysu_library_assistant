@@ -224,6 +224,7 @@ def getBookDetail(request):
         # remove : and space and -
         parsekey = signfilter.sub('', key)
         xml += '<%s><![CDATA[%s]]></%s>\n' % (parsekey, contain, parsekey)
+    collect_xml = ''
     for key in detail:
         if collect in key:
             msg = detail[key]
