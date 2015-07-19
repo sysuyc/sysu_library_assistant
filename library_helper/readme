@@ -1,0 +1,7 @@
+扫描二维码部分的代码使用了开源的zxing框架，部分用到了他人的代码，包括：
+com.zxing.activity
+com.zxing.camera
+com.zxing.decoding
+com.zxing.encoding
+com.zxing.view
+在此注明。
